@@ -21,9 +21,6 @@ function FilePicker() {
 
     setFiles(selectedFiles);
     setMessage('');
-
-    // Allow selecting the same file again later
-    event.target.value = '';
   };
 
   const handleUpload = async () => {
