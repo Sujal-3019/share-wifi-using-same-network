@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from './services/api';
 import FilePicker from './components/FilePicker';
-
+import FileList from './components/FileList';
 function App() {
   const [backendStatus, setBackendStatus] = useState('checking');
 
@@ -74,6 +74,7 @@ function App() {
             </p>
 
             <FilePicker />
+            <FileList />
           </div>
 
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
