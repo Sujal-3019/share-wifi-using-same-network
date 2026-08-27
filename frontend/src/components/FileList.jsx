@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
+import { getDeviceId } from '../services/device';
 
 function FileList() {
     const [files, setFiles] = useState([]);
@@ -12,7 +13,7 @@ function FileList() {
             setLoading(true);
             setError('');
 
-            const result = await api.getFiles();
+            const result = await api.getFiles(getDeviceId());
 
             setFiles(result.files || []);
         } catch (error) {
@@ -43,6 +44,7 @@ function FileList() {
         try {
             const blob = await api.downloadFile(
                 fileId,
+                getDeviceId(),
                 (progress, loaded, total) => {
                     setDownloads((previous) => ({
                         ...previous,

@@ -26,7 +26,7 @@ export const api = {
         return response.json();
     },
 
-    uploadFile(file, onProgress) {
+    uploadFile(file, targetDeviceId, onProgress) {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
 
@@ -102,14 +102,15 @@ export const api = {
             const formData = new FormData();
 
             formData.append('file', file);
+            formData.append('target_device_id', targetDeviceId);
 
             xhr.send(formData);
         });
     },
 
-    async getFiles() {
+    async getFiles(deviceId) {
         const response = await fetch(
-            `${API_BASE_URL}/api/files`
+            `${API_BASE_URL}/api/files?device_id=${encodeURIComponent(deviceId)}`
         );
 
         if (!response.ok) {
@@ -119,13 +120,13 @@ export const api = {
         return response.json();
     },
 
-    downloadFile(fileId, onProgress) {
+    downloadFile(fileId, deviceId, onProgress) {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
 
             xhr.open(
                 'GET',
-                `${API_BASE_URL}/api/files/${fileId}/download`
+                `${API_BASE_URL}/api/files/${fileId}/download?device_id=${encodeURIComponent(deviceId)}`
             );
 
             xhr.responseType = 'blob';
