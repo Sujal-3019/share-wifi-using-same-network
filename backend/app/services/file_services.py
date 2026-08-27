@@ -91,3 +91,19 @@ def list_uploaded_files() -> list[dict]:
         })
 
     return files
+
+def get_file_for_download(file_id: str) -> tuple[Path, dict] | None:
+    metadata = load_metadata()
+
+    for file_info in metadata:
+        if file_info["file_id"] != file_id:
+            continue
+
+        file_path = UPLOAD_DIR / file_info["stored_filename"]
+
+        if not file_path.exists() or not file_path.is_file():
+            return None
+
+        return file_path, file_info
+
+    return None
