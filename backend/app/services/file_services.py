@@ -40,7 +40,7 @@ def save_metadata(metadata: list[dict]) -> None:
         )
 
 
-def save_uploaded_file(file, original_filename: str) -> dict:
+def save_uploaded_file(file,original_filename: str,target_device_id: str,) -> dict:
     safe_filename = Path(original_filename).name
 
     file_id = uuid4().hex
@@ -60,6 +60,7 @@ def save_uploaded_file(file, original_filename: str) -> dict:
         "original_filename": safe_filename,
         "stored_filename": stored_filename,
         "size": file_size,
+        "target_device_id": target_device_id,
     }
 
     metadata = load_metadata()
@@ -73,13 +74,21 @@ def save_uploaded_file(file, original_filename: str) -> dict:
     }
 
 
-def list_uploaded_files() -> list[dict]:
+def list_uploaded_files(
+    device_id: str,
+) -> list[dict]:
     metadata = load_metadata()
 
     files = []
 
     for file_info in metadata:
-        file_path = UPLOAD_DIR / file_info["stored_filename"]
+        if file_info.get("target_device_id") != device_id:
+            continue
+
+        file_path = (
+            UPLOAD_DIR /
+            file_info["stored_filename"]
+        )
 
         if not file_path.exists():
             continue
@@ -92,16 +101,29 @@ def list_uploaded_files() -> list[dict]:
 
     return files
 
-def get_file_for_download(file_id: str) -> tuple[Path, dict] | None:
+def get_file_for_download(
+    file_id: str,
+    device_id: str,
+) -> tuple[Path, dict] | None:
     metadata = load_metadata()
 
     for file_info in metadata:
         if file_info["file_id"] != file_id:
             continue
 
-        file_path = UPLOAD_DIR / file_info["stored_filename"]
+        # Make sure this file belongs to the requesting device
+        if file_info.get("target_device_id") != device_id:
+            return None
 
-        if not file_path.exists() or not file_path.is_file():
+        file_path = (
+            UPLOAD_DIR /
+            file_info["stored_filename"]
+        )
+
+        if (
+            not file_path.exists()
+            or not file_path.is_file()
+        ):
             return None
 
         return file_path, file_info

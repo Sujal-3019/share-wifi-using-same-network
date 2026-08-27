@@ -25,14 +25,14 @@ class ConnectionManager:
     async def send_to_device(
         self,
         device_id: str,
-        message: str,
+        message: dict,
     ):
         connection = self.active_connections.get(
             device_id
         )
 
         if connection:
-            await connection["websocket"].send_text(
+            await connection["websocket"].send_json(
                 message
             )
 
@@ -41,7 +41,7 @@ class ConnectionManager:
 
         for device_id, connection in self.active_connections.items():
             try:
-                await connection["websocket"].send_text(
+                await connection["websocket"].send_json(
                     message
                 )
             except Exception:
@@ -101,13 +101,18 @@ async def websocket_endpoint(websocket: WebSocket):
 
         # Notify all connected devices
         await manager.broadcast(
-            "device_list_changed"
+            {
+                "type": "device_list_changed"
+            }
         )
 
         # Confirm registration
         await manager.send_to_device(
             device_id,
-            "Device registered successfully",
+            {
+                "type": "device_registered",
+                "message": "Device registered successfully",
+            },
         )
 
         # Keep connection alive
@@ -116,7 +121,10 @@ async def websocket_endpoint(websocket: WebSocket):
 
             await manager.send_to_device(
                 device_id,
-                f"Server received: {message}",
+                {
+                    "type": "echo",
+                    "message": message,
+                },
             )
 
     except Exception as error:
