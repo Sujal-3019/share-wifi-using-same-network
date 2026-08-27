@@ -24,13 +24,12 @@ async def files_status():
 
 @router.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
-    saved_path = save_uploaded_file(
+    result = save_uploaded_file(
         file,
         file.filename,
     )
 
     return {
         "message": "File uploaded successfully",
-        "filename": file.filename,
-        "size": saved_path.stat().st_size,
+        **result,
     }
