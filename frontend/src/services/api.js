@@ -26,24 +26,85 @@ export const api = {
         return response.json();
     },
 
-    async uploadFile(file) {
-        const formData = new FormData();
+    uploadFile(file, onProgress) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
 
-        formData.append('file', file);
+            xhr.open(
+                'POST',
+                `${API_BASE_URL}/api/files/upload`
+            );
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/files/upload`,
-            {
-                method: 'POST',
-                body: formData,
-            }
-        );
+            xhr.upload.addEventListener(
+                'progress',
+                (event) => {
+                    if (!event.lengthComputable) {
+                        return;
+                    }
 
-        if (!response.ok) {
-            throw new Error('File upload failed');
-        }
+                    const progress =
+                        (event.loaded / event.total) * 100;
 
-        return response.json();
+                    if (onProgress) {
+                        onProgress(progress, event.loaded, event.total);
+                    }
+                }
+            );
+
+            xhr.addEventListener(
+                'load',
+                () => {
+                    if (
+                        xhr.status >= 200 &&
+                        xhr.status < 300
+                    ) {
+                        try {
+                            const result = JSON.parse(
+                                xhr.responseText
+                            );
+
+                            resolve(result);
+                        } catch (error) {
+                            reject(
+                                new Error(
+                                    'Invalid server response'
+                                )
+                            );
+                        }
+                    } else {
+                        reject(
+                            new Error(
+                                `Upload failed with status ${xhr.status}`
+                            )
+                        );
+                    }
+                }
+            );
+
+            xhr.addEventListener(
+                'error',
+                () => {
+                    reject(
+                        new Error('Network error during upload')
+                    );
+                }
+            );
+
+            xhr.addEventListener(
+                'abort',
+                () => {
+                    reject(
+                        new Error('Upload cancelled')
+                    );
+                }
+            );
+
+            const formData = new FormData();
+
+            formData.append('file', file);
+
+            xhr.send(formData);
+        });
     },
 
     async getFiles() {
