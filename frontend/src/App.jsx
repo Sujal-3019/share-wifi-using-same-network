@@ -1,4 +1,20 @@
+import { useEffect, useState } from 'react';
+import { api } from './services/api';
+import FilePicker from './components/FilePicker';
+
 function App() {
+  const [backendStatus, setBackendStatus] = useState('checking');
+
+  useEffect(() => {
+    api.health()
+      .then(() => {
+        setBackendStatus('online');
+      })
+      .catch(() => {
+        setBackendStatus('offline');
+      });
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <header className="border-b border-slate-800">
@@ -14,10 +30,18 @@ function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+            <span
+              className={`h-2.5 w-2.5 rounded-full ${
+                backendStatus === 'online'
+                  ? 'bg-emerald-400'
+                  : backendStatus === 'offline'
+                    ? 'bg-red-400'
+                    : 'bg-yellow-400'
+              }`}
+            />
 
             <span className="text-sm text-slate-300">
-              Online
+              Backend {backendStatus}
             </span>
           </div>
         </div>
@@ -49,9 +73,7 @@ function App() {
               Select files and send them to another connected device.
             </p>
 
-            <button className="mt-6 rounded-xl bg-white px-5 py-3 font-medium text-slate-950 transition hover:bg-slate-200">
-              Select Files
-            </button>
+            <FilePicker />
           </div>
 
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
@@ -74,28 +96,20 @@ function App() {
         </section>
 
         <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-            <div>
-              <h3 className="text-xl font-semibold">
-                Connected Devices
-              </h3>
+          <h3 className="text-xl font-semibold">
+            Backend Connection
+          </h3>
 
-              <p className="mt-1 text-sm text-slate-400">
-                Devices currently connected to this LocalShare server.
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-slate-800 px-4 py-3 text-sm">
-              <span className="font-semibold">1</span>
-              <span className="ml-1 text-slate-400">
-                device
-              </span>
-            </div>
-          </div>
+          <p className="mt-2 text-slate-400">
+            FastAPI status:
+            <span className="ml-2 font-medium text-white">
+              {backendStatus}
+            </span>
+          </p>
         </section>
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
