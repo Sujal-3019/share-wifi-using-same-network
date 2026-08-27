@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.files import router as files_router
-
+from app.websocket import websocket_endpoint
+from app.api.devices import router as devices_router
 
 app = FastAPI(
     title="Local File Share",
@@ -40,3 +41,5 @@ async def health():
 
 
 app.include_router(files_router)
+app.include_router(devices_router)
+app.websocket("/ws")(websocket_endpoint)
