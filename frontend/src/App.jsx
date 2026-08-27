@@ -1,9 +1,58 @@
 import { useEffect, useState } from 'react';
 import { api } from './services/api';
 import FilePicker from './components/FilePicker';
+import DeviceList from './components/DeviceList';
 import FileList from './components/FileList';
+import {
+  getDeviceId,
+  getDeviceName,
+} from './services/device';
 function App() {
+  const currentDeviceId = getDeviceId();
   const [backendStatus, setBackendStatus] = useState('checking');
+  const [deviceListVersion, setDeviceListVersion] = useState(0);
+  const [selectedDevice, setSelectedDevice] = useState(null);
+
+  useEffect(() => {
+    const ws = new WebSocket(
+      'ws://192.168.1.36:8000/ws'
+    );
+
+    ws.onopen = () => {
+      console.log('WebSocket connected');
+
+      ws.send(
+        JSON.stringify({
+          device_id: getDeviceId(),
+          device_name: getDeviceName(),
+        })
+      );
+    };
+
+    ws.onmessage = (event) => {
+      console.log(
+        'WebSocket:',
+        event.data
+      );
+
+      if (event.data === 'device_list_changed') {
+        setDeviceListVersion(
+          (previous) => previous + 1
+        );
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error(
+        'WebSocket error:',
+        error
+      );
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
 
   useEffect(() => {
     api.health()
@@ -31,13 +80,12 @@ function App() {
 
           <div className="flex items-center gap-2">
             <span
-              className={`h-2.5 w-2.5 rounded-full ${
-                backendStatus === 'online'
-                  ? 'bg-emerald-400'
-                  : backendStatus === 'offline'
-                    ? 'bg-red-400'
-                    : 'bg-yellow-400'
-              }`}
+              className={`h-2.5 w-2.5 rounded-full ${backendStatus === 'online'
+                ? 'bg-emerald-400'
+                : backendStatus === 'offline'
+                  ? 'bg-red-400'
+                  : 'bg-yellow-400'
+                }`}
             />
 
             <span className="text-sm text-slate-300">
@@ -59,6 +107,13 @@ function App() {
           </p>
         </section>
 
+        <DeviceList
+          refreshTrigger={deviceListVersion}
+          selectedDevice={selectedDevice}
+          onSelectDevice={setSelectedDevice}
+          currentDeviceId={currentDeviceId}
+        />
+        <br></br>
         <section className="grid gap-6 md:grid-cols-2">
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
             <div className="mb-5 text-4xl">
@@ -94,19 +149,6 @@ function App() {
               View Files
             </button>
           </div>
-        </section>
-
-        <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-          <h3 className="text-xl font-semibold">
-            Backend Connection
-          </h3>
-
-          <p className="mt-2 text-slate-400">
-            FastAPI status:
-            <span className="ml-2 font-medium text-white">
-              {backendStatus}
-            </span>
-          </p>
         </section>
       </main>
     </div>

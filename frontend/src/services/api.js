@@ -191,4 +191,17 @@ export const api = {
             xhr.send();
         });
     },
+    async getDevices() {
+        const response = await fetch(
+            `${API_BASE_URL}/api/devices`
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                'Failed to fetch devices'
+            );
+        }
+
+        return response.json();
+    },
 };
