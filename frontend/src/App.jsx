@@ -195,7 +195,7 @@ function App() {
 
           <h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
             Share files.
-            <span className="mt-2 block bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="mt-2 block bg-linear-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
               Locally.
             </span>
           </h2>

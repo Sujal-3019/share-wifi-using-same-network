@@ -99,7 +99,7 @@ function DeviceList({
             {!loading &&
                 !error &&
                 visibleDevices.length === 0 && (
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-8 text-center">
+                    <div className="rounded-2xl border border-white/10 bg-white/3 px-5 py-8 text-center">
                         <div className="text-3xl">
                             📡
                         </div>
@@ -134,7 +134,7 @@ function DeviceList({
                                     className={`group flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition duration-200 active:scale-[0.99] ${
                                         isSelected
                                             ? 'border-emerald-400/40 bg-emerald-400/10 shadow-lg shadow-emerald-500/5'
-                                            : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]'
+                                            : 'border-white/10 bg-white/3 hover:bg-white/6'
                                     }`}
                                 >
                                     {/* Icon */}

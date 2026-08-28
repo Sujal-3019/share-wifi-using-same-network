@@ -160,7 +160,7 @@ function FileList() {
 
             {/* Empty state */}
             {!error && files.length === 0 && (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-8 text-center">
+                <div className="rounded-2xl border border-white/10 bg-white/3 px-5 py-8 text-center">
                     <div className="text-3xl">
                         📂
                     </div>
@@ -185,7 +185,7 @@ function FileList() {
                         return (
                             <div
                                 key={file.file_id}
-                                className="glass-soft rounded-2xl p-4 transition hover:bg-white/[0.06]"
+                                className="glass-soft rounded-2xl p-4 transition hover:bg-white/6"
                             >
                                 <div className="flex items-center gap-3">
                                     {/* File icon */}
