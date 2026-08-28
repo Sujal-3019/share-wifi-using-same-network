@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+import socket
 from app.api.files import router as files_router
 from app.websocket import websocket_endpoint
 from app.api.devices import router as devices_router
@@ -37,6 +37,29 @@ async def root():
 async def health():
     return {
         "status": "healthy"
+    }
+
+@app.get("/api/network")
+async def network_info():
+    hostname = socket.gethostname()
+
+    try:
+        # Create a UDP socket to determine the local
+        # network interface/IP used by the machine.
+        with socket.socket(
+            socket.AF_INET,
+            socket.SOCK_DGRAM,
+        ) as sock:
+            sock.connect(("8.8.8.8", 80))
+            local_ip = sock.getsockname()[0]
+
+    except OSError:
+        local_ip = socket.gethostbyname(hostname)
+
+    return {
+        "hostname": hostname,
+        "local_ip": local_ip,
+        "frontend_url": f"http://{local_ip}:5173",
     }
 
 
