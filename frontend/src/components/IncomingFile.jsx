@@ -1,50 +1,71 @@
-function IncomingFile({ file, onDownload, onDismiss }) {
+function IncomingFile({
+    file,
+    onDownload,
+    onDismiss,
+}) {
     return (
-        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5">
-            <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                        <span className="text-xl">
-                            📥
-                        </span>
+        <div className="glass-strong relative overflow-hidden rounded-3xl border border-emerald-400/20 p-5 sm:p-6">
+            {/* Accent glow */}
+            <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-400/10 blur-3xl" />
 
-                        <p className="font-semibold text-white">
-                            New File
-                        </p>
+            <div className="relative">
+                <div className="flex items-start justify-between gap-4">
+                    <div className="flex min-w-0 items-start gap-3">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-400/10 text-xl">
+                            📥
+                        </div>
+
+                        <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                                <p className="font-semibold text-primary">
+                                    New File
+                                </p>
+
+                                <span className="rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
+                                    Incoming
+                                </span>
+                            </div>
+
+                            <p
+                                className="mt-2 truncate font-medium text-primary"
+                                title={file.filename}
+                            >
+                                {file.filename}
+                            </p>
+
+                            <p className="mt-1 text-sm text-secondary">
+                                {formatFileSize(file.size)}
+                            </p>
+                        </div>
                     </div>
 
-                    <p className="mt-3 truncate font-medium text-white">
-                        {file.filename}
-                    </p>
-
-                    <p className="mt-1 text-sm text-slate-400">
-                        {formatFileSize(file.size)}
-                    </p>
+                    <button
+                        type="button"
+                        onClick={onDismiss}
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted transition hover:bg-white/5 hover:text-primary active:scale-95"
+                        aria-label="Dismiss notification"
+                    >
+                        ✕
+                    </button>
                 </div>
 
-                <button
-                    onClick={onDismiss}
-                    className="text-slate-500 transition hover:text-white"
-                    aria-label="Dismiss notification"
-                >
-                    ✕
-                </button>
-            </div>
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                    <button
+                        type="button"
+                        onClick={onDownload}
+                        className="rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/10 transition hover:bg-emerald-300 active:scale-[0.98]"
+                    >
+                        ↓ Download
+                    </button>
 
-            <div className="mt-4 flex gap-3">
-                <button
-                    onClick={onDownload}
-                    className="rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-400"
-                >
-                    Download
-                </button>
-
-                <button
-                    onClick={onDismiss}
-                    className="rounded-xl border border-slate-700 px-4 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-slate-800"
-                >
-                    Dismiss
-                </button>
+                    <button
+                        type="button"
+                        onClick={onDismiss}
+                        className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-secondary backdrop-blur-xl transition hover:bg-white/10 active:scale-[0.98]"
+                    >
+                        Dismiss
+                    </button>
+                </div>
             </div>
         </div>
     );

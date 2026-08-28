@@ -205,4 +205,18 @@ export const api = {
 
         return response.json();
     },
+
+    async getNetworkInfo() {
+        const response = await fetch(
+            `${API_BASE_URL}/api/network`
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                'Failed to get network information'
+            );
+        }
+
+        return response.json();
+    },
 };

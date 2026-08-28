@@ -4,6 +4,8 @@ import FilePicker from './components/FilePicker';
 import DeviceList from './components/DeviceList';
 import FileList from './components/FileList';
 import IncomingFile from './components/IncomingFile';
+import QRCodeShare from './components/QRCodeShare';
+import ThemeToggle from './components/ThemeToggle';
 import {
   getDeviceId,
   getDeviceName,
@@ -142,115 +144,174 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <header className="border-b border-slate-800">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <div>
-            <h1 className="text-2xl font-bold">
-              LocalShare
-            </h1>
+  <div className="min-h-screen px-4 py-5 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl">
 
-            <p className="text-sm text-slate-400">
-              Fast local file sharing
-            </p>
+      {/* Header */}
+      <header className="glass rounded-3xl px-5 py-4 sm:px-6">
+        <div className="flex items-center justify-between gap-4">
+
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-xl shadow-lg">
+              ⚡
+            </div>
+
+            <div>
+              <h1 className="text-lg font-bold tracking-tight sm:text-xl">
+                LocalShare
+              </h1>
+
+              <p className="text-xs text-secondary sm:text-sm">
+                Fast local file sharing
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span
-              className={`h-2.5 w-2.5 rounded-full ${backendStatus === 'online'
-                ? 'bg-emerald-400'
-                : backendStatus === 'offline'
-                  ? 'bg-red-400'
-                  : 'bg-yellow-400'
-                }`}
-            />
+          <div className="flex items-center gap-3">
+            <div className="hidden items-center gap-2 rounded-xl bg-emerald-400/10 px-3 py-2 sm:flex">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
 
-            <span className="text-sm text-slate-300">
-              Backend {backendStatus}
-            </span>
+              <span className="text-xs font-medium text-emerald-400">
+                {backendStatus === 'online'
+                  ? 'Connected'
+                  : backendStatus === 'checking'
+                    ? 'Connecting'
+                    : 'Offline'}
+              </span>
+            </div>
+
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        {/* Page heading */}
+      {/* Hero */}
+      <section className="py-12 text-center sm:py-16">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-xs font-medium text-emerald-400">
+            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            Same Wi-Fi · No Cloud
+          </div>
 
-        {incomingFiles.length > 0 && (
-          <section className="mb-6 space-y-3">
-            {incomingFiles.map((file) => (
-              <IncomingFile
-                key={file.file_id}
-                file={file}
-                onDownload={() =>
-                  handleIncomingDownload(file)
-                }
-                onDismiss={() =>
-                  dismissIncomingFile(
-                    file.file_id
-                  )
-                }
-              />
-            ))}
-          </section>
-        )}
-        <section className="mb-10">
-          <h2 className="text-4xl font-bold tracking-tight">
-            Share files locally.
+          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+            Share files.
+            <span className="mt-2 block bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Locally.
+            </span>
           </h2>
 
-          <p className="mt-3 max-w-xl text-slate-400">
-            Transfer files between devices connected to the same Wi-Fi
-            network. No cloud storage required.
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-secondary sm:text-base">
+            Transfer photos, videos and documents directly
+            between devices connected to the same Wi-Fi
+            network.
           </p>
+        </div>
+      </section>
+
+      {/* Incoming files */}
+      {incomingFiles.length > 0 && (
+        <section className="mb-6 space-y-3">
+          {incomingFiles.map((file) => (
+            <IncomingFile
+              key={file.file_id}
+              file={file}
+              onDownload={() =>
+                handleIncomingDownload(file)
+              }
+              onDismiss={() =>
+                dismissIncomingFile(file.file_id)
+              }
+            />
+          ))}
         </section>
+      )}
 
-        <DeviceList
-          refreshTrigger={deviceListVersion}
-          selectedDevice={selectedDevice}
-          onSelectDevice={setSelectedDevice}
-          currentDeviceId={currentDeviceId}
-        />
+      {/* Devices */}
+      <DeviceList
+        refreshTrigger={deviceListVersion}
+        selectedDevice={selectedDevice}
+        onSelectDevice={setSelectedDevice}
+        currentDeviceId={currentDeviceId}
+      />
 
-        <br></br>
-        <section className="grid gap-6 md:grid-cols-2">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            <div className="mb-5 text-4xl">
-              📤
+      {/* Main actions */}
+      <section className="mt-6 grid gap-6 lg:grid-cols-2">
+
+        {/* Send */}
+        <div className="glass rounded-3xl p-6 sm:p-8">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-400/10 text-2xl">
+                📤
+              </div>
+
+              <h3 className="text-2xl font-semibold">
+                Send Files
+              </h3>
+
+              <p className="mt-2 max-w-md text-sm leading-6 text-secondary">
+                Choose a connected device and send files
+                directly over your local network.
+              </p>
             </div>
 
-            <h3 className="text-xl font-semibold">
-              Send Files
-            </h3>
+            <span className="rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-400">
+              LAN
+            </span>
+          </div>
 
-            <p className="mt-2 text-sm text-slate-400">
-              Select files and send them to another connected device.
-            </p>
+          <div className="mt-6">
+            <FilePicker
+              selectedDevice={selectedDevice}
+            />
+          </div>
+        </div>
 
-            <FilePicker selectedDevice={selectedDevice} />
+        {/* Received */}
+        <div className="glass rounded-3xl p-6 sm:p-8">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-400/10 text-2xl">
+                📥
+              </div>
+
+              <h3 className="text-2xl font-semibold">
+                Received Files
+              </h3>
+
+              <p className="mt-2 max-w-md text-sm leading-6 text-secondary">
+                Files shared with this device appear here
+                automatically.
+              </p>
+            </div>
+
+            <span className="rounded-full bg-purple-400/10 px-3 py-1 text-xs font-medium text-purple-400">
+              Local
+            </span>
+          </div>
+
+          <div className="mt-6">
             <FileList />
           </div>
+        </div>
 
-          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            <div className="mb-5 text-4xl">
-              📥
-            </div>
+      </section>
 
-            <h3 className="text-xl font-semibold">
-              Received Files
-            </h3>
+      {/* QR */}
+      <section className="mt-6">
+        <QRCodeShare />
+      </section>
 
-            <p className="mt-2 text-sm text-slate-400">
-              View and download files received from other devices.
-            </p>
+      {/* Footer */}
+      <footer className="py-8 text-center">
+        <p className="text-xs text-muted">
+          LocalShare · Files stay on your local network
+        </p>
+      </footer>
 
-            <button className="mt-6 rounded-xl border border-slate-700 px-5 py-3 font-medium transition hover:bg-slate-800">
-              View Files
-            </button>
-          </div>
-        </section>
-      </main>
     </div>
-  );
+  </div>
+);
 }
 
 export default App;
