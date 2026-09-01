@@ -1,9 +1,30 @@
 from fastapi import FastAPI
+import uvicorn
+import threading
+import webbrowser
 from fastapi.middleware.cors import CORSMiddleware
 import socket
 from app.api.files import router as files_router
 from app.websocket import websocket_endpoint
 from app.api.devices import router as devices_router
+from pathlib import Path
+import sys
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+def get_resource_directory() -> Path:
+    """
+    Returns the directory containing bundled application resources.
+    """
+    if getattr(sys, "frozen", False):
+        return Path(sys._MEIPASS)
+
+    return Path(__file__).resolve().parents[2]
+
+
+RESOURCE_DIR = get_resource_directory()
+
+FRONTEND_DIST = RESOURCE_DIR / "frontend" / "dist"
 
 app = FastAPI(
     title="Local File Share",
@@ -23,14 +44,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.get("/")
-async def root():
-    return {
-        "message": "Local File Share API is running",
-        "status": "online",
-    }
 
 
 @app.get("/health")
@@ -59,10 +72,49 @@ async def network_info():
     return {
         "hostname": hostname,
         "local_ip": local_ip,
-        "frontend_url": f"http://{local_ip}:5173",
+        "frontend_url": f"http://{local_ip}:8000",
     }
 
 
 app.include_router(files_router)
 app.include_router(devices_router)
 app.websocket("/ws")(websocket_endpoint)
+
+if FRONTEND_DIST.exists():
+    app.mount(
+        "/assets",
+        StaticFiles(
+            directory=FRONTEND_DIST / "assets"
+        ),
+        name="assets",
+    )
+
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    requested_file = FRONTEND_DIST / full_path
+
+    if (
+        full_path
+        and requested_file.exists()
+        and requested_file.is_file()
+    ):
+        return FileResponse(requested_file)
+
+    return FileResponse(
+        FRONTEND_DIST / "index.html"
+    )
+
+if __name__ == "__main__":
+    def open_browser():
+        webbrowser.open("http://localhost:8000")
+
+    threading.Timer(
+        1.5,
+        open_browser
+    ).start()
+
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=8000,
+    )
